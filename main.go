@@ -13,6 +13,7 @@ import (
 )
 
 const uploadDir = "./uploads"
+const staticDir = "./static"
 
 func main() {
 	// Create the uploads folder if it doesn't exist
@@ -26,7 +27,7 @@ func main() {
 	// Load UI
 	r.LoadHTMLGlob("templates/*")
 
-	r.Static("/static", "./static")
+	r.Static("/static", staticDir)
 	// Routes
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)

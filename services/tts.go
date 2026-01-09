@@ -7,16 +7,15 @@ import (
 
 // GenerateSpeech call edge-tts CLI to create file mp3
 func GenerateSpeech(text string, outputPath string) error {
-	// Use Vietnamese voice
-	voice := "vi-VN-HoaiMyNeural"
-
-	// Cmd: edge-tts --voice vi-VN-HoaiMyNeural --text "content" --write-media out.mp3
-	cmd := exec.Command("edge-tts", "--voice", voice, "--text", text, "--write-media", outputPath)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("error edge-tts: %v, detail: %s", err, string(output))
-	}
-
-	return nil
+    voice := "vi-VN-HoaiMyNeural"
+    
+    // Use "python", "-m", "edge_tts" instead of calling "edge-tts" directly.
+    // This helps avoid PATH errors if your python command is already working.
+    cmd := exec.Command("python", "-m", "edge_tts", "--voice", voice, "--text", text, "--write-media", outputPath)
+    
+    output, err := cmd.CombinedOutput()
+    if err != nil {
+        return fmt.Errorf("lỗi: %v, chi tiết: %s", err, string(output))
+    }
+    return nil
 }

@@ -1,0 +1,29 @@
+# --- Binaries & Executables ---
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# --- Go Dependencies ---
+vendor
+go.sum
+
+# --- Temporary Files ---
+
+uploads/*
+# Trừ file .gitkeep nếu bạn muốn giữ thư mục uploads trên Git
+!uploads/.gitkeep
+
+*.mp3
+*.pdf
+*.docx
+
+# --- Logs & OS Files ---
+*.log
+.DS_Store
+Thumbs.db
+
+# --- Gemini Instructions & Notes ---
+gemini.md
