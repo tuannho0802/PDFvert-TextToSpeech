@@ -25,6 +25,7 @@ btnConvert.onclick = async () => {
   const format = document.getElementById(
     "target-format"
   ).value;
+
   if (!file)
     return alert("Vui lòng chọn file!");
 
@@ -38,14 +39,38 @@ btnConvert.onclick = async () => {
       method: "POST",
       body: formData,
     });
+
     if (!resp.ok)
       throw new Error("Chuyển đổi thất bại");
 
     const blob = await resp.blob();
-    downloadBlob(
-      blob,
-      `converted_file.${format}`
-    );
+
+    // get original file name without extension
+    const originalName = file.name;
+    // find last dot index
+    const lastDotIndex =
+      originalName.lastIndexOf(".");
+    // get name without extension
+    const baseName =
+      lastDotIndex !== -1
+        ? originalName.substring(
+            0,
+            lastDotIndex
+          )
+        : originalName;
+
+    // create new file name with target format
+    const newFileName = `${baseName}.${format}`;
+
+    console.log(
+      "Tên file sẽ tải về:",
+      newFileName
+    ); // Debug log for new file name
+
+    downloadBlob(blob, newFileName);
+
+    // get new file name with target format
+    downloadBlob(blob, newFileName);
   } catch (err) {
     alert(err.message);
   } finally {
@@ -91,9 +116,15 @@ function downloadBlob(blob, filename) {
   const url =
     globalThis.URL.createObjectURL(blob);
   const a = document.createElement("a");
+  a.style.display = "none"; // hide the element
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  globalThis.URL.revokeObjectURL(url);
+
+  // delay removal to ensure download starts
+  setTimeout(() => {
+    document.body.removeChild(a);
+    globalThis.URL.revokeObjectURL(url);
+  }, 100);
 }

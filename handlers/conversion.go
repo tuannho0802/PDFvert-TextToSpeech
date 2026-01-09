@@ -1,33 +1,67 @@
 package handlers
 
 import (
-	"net/http"
-	"path/filepath"
-
+	"fmt"
 	"go-converter-pro/services"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func HandleConversion(c *gin.Context) {
-	file, _ := c.FormFile("file")
-	targetFormat := c.PostForm("format") // "docx" or "pdf"
+	fmt.Println("--- BẮT ĐẦU XỬ LÝ CONVERT ---")
 
-	// Save temp file
-	srcPath := filepath.Join("./uploads", file.Filename)
-	if err := c.SaveUploadedFile(file, srcPath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Không thể lưu file tạm"})
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Không nhận được file"})
 		return
 	}
 
-	// Call service convert
-	outputDir := "./uploads"
-	resultPath, err := services.ConvertFile(srcPath, outputDir, targetFormat)
+	targetFormat := c.PostForm("format")
+
+	// Get the absolute path to the uploads folder.
+	absOutputDir, _ := filepath.Abs("./uploads")
+	// Tạo thư mục nếu chưa có
+	os.MkdirAll(absOutputDir, os.ModePerm)
+
+	// Temporary root file path
+	srcPath := filepath.Join(absOutputDir, file.Filename)
+
+	if err := c.SaveUploadedFile(file, srcPath); err != nil {
+		fmt.Println("LỖI LƯU FILE:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lưu file tạm thất bại"})
+		return
+	}
+
+	fmt.Printf("Đang chuyển đổi: %s -> %s\n", file.Filename, targetFormat)
+
+	// Call service to convert file
+	resultPath, err := services.ConvertFile(srcPath, absOutputDir, targetFormat)
 	if err != nil {
+		fmt.Println("LỖI TỪ SERVICES:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Return the converted file
+	// Delay a bit to ensure file system is updated
+	time.Sleep(200 * time.Millisecond)
+
+	// Check if the result file exists
+	if _, err := os.Stat(resultPath); os.IsNotExist(err) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy file sau chuyển đổi"})
+		return
+	}
+
+	// Set headers to prompt file download
+	outputFileName := filepath.Base(resultPath)
+	c.Header("Access-Control-Expose-Headers", "Content-Disposition")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", outputFileName))
+	c.Header("Content-Type", "application/octet-stream")
+
 	c.File(resultPath)
+
+	fmt.Println("CHUYỂN ĐỔI THÀNH CÔNG!")
 }
