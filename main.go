@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,9 +16,39 @@ import (
 const uploadDir = "./uploads"
 const staticDir = "./static"
 
+// startCleanupWorker starts a goroutine to periodically clean up the uploads folder
+func startCleanupWorker(dir string, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			files, err := os.ReadDir(dir)
+			if err != nil {
+				continue
+			}
+
+			now := time.Now()
+			for _, f := range files {
+				info, err := f.Info()
+				if err != nil {
+					continue
+				}
+
+				// If file is older than the interval, delete it
+				if now.Sub(info.ModTime()) > interval {
+					path := filepath.Join(dir, f.Name())
+					os.Remove(path)
+					fmt.Printf("--- CLEANUP: Đã xóa file cũ: %s ---\n", f.Name())
+				}
+			}
+		}
+	}()
+}
+
 func main() {
 	// Create the uploads folder if it doesn't exist
 	os.MkdirAll(uploadDir, os.ModePerm)
+
+	startCleanupWorker("./uploads", 5*time.Minute)
 
 	r := gin.Default()
 
@@ -42,25 +73,4 @@ func main() {
 
 	log.Println("Listening on http://localhost:8080")
 	r.Run(":8080")
-}
-
-// startCleanupTask starts a goroutine to periodically clean up the uploads folder
-func startCleanupTask() {
-	go func() {
-		for {
-			// Run cleanup every 30 minutes
-			time.Sleep(30 * time.Minute)
-
-			files, err := os.ReadDir(uploadDir)
-			if err != nil {
-				continue
-			}
-
-			for _, file := range files {
-				// Remove files in uploads folder
-				os.Remove(filepath.Join(uploadDir, file.Name()))
-			}
-			log.Println("Thư mục tạm đã được dọn dẹp sạch sẽ!")
-		}
-	}()
 }

@@ -1,7 +1,6 @@
+// Element References
 const loader =
   document.getElementById("loader");
-
-// Handle file conversion
 const dropZone =
   document.getElementById("drop-zone");
 const fileInput =
@@ -9,25 +8,77 @@ const fileInput =
 const btnConvert = document.getElementById(
   "btn-convert"
 );
+const targetFormatSelect =
+  document.getElementById("target-format");
+const fileLabel =
+  document.getElementById("file-label");
 
+// --- Check file format ---
+function validateFormats() {
+  const file = fileInput.files[0];
+  const targetFormat = targetFormatSelect.value;
+
+  if (!file) {
+    btnConvert.disabled = true;
+    return;
+  }
+
+  const fileExt = file.name
+    .split(".")
+    .pop()
+    .toLowerCase();
+
+  // Check if the selected file format matches the target format
+  if (fileExt === targetFormat) {
+    btnConvert.disabled = true;
+    btnConvert.innerText =
+      "Định dạng không hợp lệ";
+    btnConvert.style.backgroundColor = "#ccc";
+    btnConvert.style.cursor = "not-allowed"; // Warning cursor
+    fileLabel.style.color = "red";
+  } else {
+    // Get back to normal state
+    btnConvert.disabled = false;
+    btnConvert.innerText = "Bắt đầu chuyển đổi";
+    btnConvert.style.backgroundColor = "";
+    btnConvert.style.cursor = "pointer";
+    fileLabel.style.color = "";
+  }
+}
+
+// --- Choose file ---
 dropZone.onclick = () => fileInput.click();
 
 fileInput.onchange = (e) => {
   if (e.target.files.length > 0) {
-    document.getElementById(
-      "file-label"
-    ).innerText = e.target.files[0].name;
+    const file = e.target.files[0];
+    const fileExt = file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+    fileLabel.innerText = file.name;
+
+    // Auto-select target format
+    if (fileExt === "pdf") {
+      targetFormatSelect.value = "docx";
+    } else if (fileExt === "docx") {
+      targetFormatSelect.value = "pdf";
+    }
+
+    // Call format validation
+    validateFormats();
   }
 };
 
+targetFormatSelect.onchange = validateFormats;
+
+// --- Convert file ---
 btnConvert.onclick = async () => {
   const file = fileInput.files[0];
-  const format = document.getElementById(
-    "target-format"
-  ).value;
+  const format = targetFormatSelect.value;
 
-  if (!file)
-    return alert("Vui lòng chọn file!");
+  if (!file || btnConvert.disabled) return;
 
   const formData = new FormData();
   formData.append("file", file);
@@ -45,12 +96,10 @@ btnConvert.onclick = async () => {
 
     const blob = await resp.blob();
 
-    // get original file name without extension
+    // Create new file name with correct extension
     const originalName = file.name;
-    // find last dot index
     const lastDotIndex =
       originalName.lastIndexOf(".");
-    // get name without extension
     const baseName =
       lastDotIndex !== -1
         ? originalName.substring(
@@ -58,18 +107,8 @@ btnConvert.onclick = async () => {
             lastDotIndex
           )
         : originalName;
-
-    // create new file name with target format
     const newFileName = `${baseName}.${format}`;
 
-    console.log(
-      "Tên file sẽ tải về:",
-      newFileName
-    ); // Debug log for new file name
-
-    downloadBlob(blob, newFileName);
-
-    // get new file name with target format
     downloadBlob(blob, newFileName);
   } catch (err) {
     alert(err.message);
@@ -78,7 +117,7 @@ btnConvert.onclick = async () => {
   }
 };
 
-// Handle TTS
+// --- Handle TTS ---
 const btnTTS =
   document.getElementById("btn-tts");
 btnTTS.onclick = async () => {
@@ -108,6 +147,7 @@ btnTTS.onclick = async () => {
   }
 };
 
+// --- Helpers functions ---
 function showLoader(show) {
   loader.classList.toggle("hidden", !show);
 }
@@ -116,13 +156,12 @@ function downloadBlob(blob, filename) {
   const url =
     globalThis.URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.style.display = "none"; // hide the element
+  a.style.display = "none";
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
 
-  // delay removal to ensure download starts
   setTimeout(() => {
     document.body.removeChild(a);
     globalThis.URL.revokeObjectURL(url);
