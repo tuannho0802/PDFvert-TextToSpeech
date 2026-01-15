@@ -29,7 +29,7 @@ func HandleConversion(c *gin.Context) {
 	os.MkdirAll(absOutputDir, os.ModePerm)
 
 	var resultPath string
-	var err error
+	var err error = fmt.Errorf("uninitialized")
 
 	switch operation {
 	case "compress":
@@ -142,23 +142,6 @@ func HandleConversion(c *gin.Context) {
 		fmt.Printf("Đang chuyển đổi hình ảnh sang PDF: %s\n", file.Filename)
 		resultPath, err = services.ConvertImageToPDF(srcPath, absOutputDir)
 
-	case "ocr":
-		// OCR Text Extraction
-		file, err := c.FormFile("file")
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Không nhận được file"})
-			return
-		}
-
-		srcPath := filepath.Join(absOutputDir, file.Filename)
-		if err := c.SaveUploadedFile(file, srcPath); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Lưu file tạm thất bại"})
-			return
-		}
-
-		fmt.Printf("Đang trích xuất văn bản bằng OCR: %s\n", file.Filename)
-		resultPath, err = services.ExtractTextWithOCR(srcPath, absOutputDir)
-
 	case "convert":
 		// Original conversion functionality
 		file, err := c.FormFile("file")
@@ -184,6 +167,7 @@ func HandleConversion(c *gin.Context) {
 
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Operation không được hỗ trợ"})
+		err = fmt.Errorf("operation not supported")
 		return
 	}
 

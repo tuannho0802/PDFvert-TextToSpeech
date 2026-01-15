@@ -1,19 +1,37 @@
 // Element References
-const loader = document.getElementById("loader");
-const dropZone = document.getElementById("drop-zone");
-const fileInput = document.getElementById("file-input");
-const filesInput = document.getElementById("files-input");
-const btnConvert = document.getElementById("btn-convert");
-const targetFormatSelect = document.getElementById("target-format");
-const fileLabel = document.getElementById("file-label");
-const mergeOutputName = document.getElementById("merge-output-name");
-const splitPages = document.getElementById("split-pages");
-const selectedOperation = document.getElementById("selected-operation");
-const selectedOperationText = document.getElementById("selected-operation-text");
-const operationCards = document.querySelectorAll('.operation-card');
+const loader =
+  document.getElementById("loader");
+const dropZone =
+  document.getElementById("drop-zone");
+const fileInput =
+  document.getElementById("file-input");
+const filesInput = document.getElementById(
+  "files-input"
+);
+const btnConvert = document.getElementById(
+  "btn-convert"
+);
+const targetFormatSelect =
+  document.getElementById("target-format");
+const fileLabel =
+  document.getElementById("file-label");
+const mergeOutputName = document.getElementById(
+  "merge-output-name"
+);
+const splitPages = document.getElementById(
+  "split-pages"
+);
+const selectedOperation =
+  document.getElementById("selected-operation");
+const selectedOperationText =
+  document.getElementById(
+    "selected-operation-text"
+  );
+const operationCards =
+  document.querySelectorAll(".operation-card");
 
 // Current selected operation (default to 'convert')
-let currentOperation = 'convert';
+let currentOperation = "convert";
 
 // --- Operation type handling ---
 function selectOperation(operation) {
@@ -21,13 +39,21 @@ function selectOperation(operation) {
   currentOperation = operation;
 
   // Update visual selection
-  operationCards.forEach(card => {
+  operationCards.forEach((card) => {
     if (card.dataset.operation === operation) {
-      card.classList.add('selected', 'border-indigo-500', 'bg-indigo-50');
-      card.classList.remove('border-slate-200');
+      card.classList.add(
+        "selected",
+        "border-indigo-500",
+        "bg-indigo-50"
+      );
+      card.classList.remove("border-slate-200");
     } else {
-      card.classList.remove('selected', 'border-indigo-500', 'bg-indigo-50');
-      card.classList.add('border-slate-200');
+      card.classList.remove(
+        "selected",
+        "border-indigo-500",
+        "bg-indigo-50"
+      );
+      card.classList.add("border-slate-200");
     }
   });
 
@@ -35,12 +61,18 @@ function selectOperation(operation) {
   updateSelectedOperationDisplay(operation);
 
   // Hide all operation options
-  document.querySelectorAll('.operation-option').forEach(el => el.classList.add('hidden'));
+  document
+    .querySelectorAll(".operation-option")
+    .forEach((el) =>
+      el.classList.add("hidden")
+    );
 
   // Show relevant option
-  const optionEl = document.getElementById(`${operation}-options`);
+  const optionEl = document.getElementById(
+    `${operation}-options`
+  );
   if (optionEl) {
-    optionEl.classList.remove('hidden');
+    optionEl.classList.remove("hidden");
   }
 
   // Update file input accept attribute and label
@@ -53,18 +85,20 @@ function selectOperation(operation) {
   resetFileSelection();
 }
 
-function updateSelectedOperationDisplay(operation) {
+function updateSelectedOperationDisplay(
+  operation
+) {
   const operationNames = {
-    'convert': 'Chuyển đổi định dạng',
-    'compress': 'Nén PDF',
-    'merge': 'Gộp PDF',
-    'split': 'Tách PDF',
-    'image-to-pdf': 'Hình ảnh sang PDF',
-    'ocr': 'Trích xuất văn bản (OCR)'
+    convert: "Chuyển đổi định dạng",
+    compress: "Nén PDF",
+    merge: "Gộp PDF",
+    split: "Tách PDF",
+    "image-to-pdf": "Hình ảnh sang PDF",
   };
 
-  selectedOperationText.textContent = operationNames[operation] || operation;
-  selectedOperation.classList.remove('hidden');
+  selectedOperationText.textContent =
+    operationNames[operation] || operation;
+  selectedOperation.classList.remove("hidden");
 }
 
 function updateFileInput(operation) {
@@ -72,29 +106,30 @@ function updateFileInput(operation) {
   let label = "";
 
   switch (operation) {
-    case 'convert':
+    case "convert":
       accept = ".pdf,.docx";
-      label = "Kéo thả file PDF/DOCX vào đây hoặc click để chọn";
+      label =
+        "Kéo thả file PDF/DOCX vào đây hoặc click để chọn";
       break;
-    case 'compress':
+    case "compress":
       accept = ".pdf";
-      label = "Kéo thả file PDF vào đây hoặc click để chọn";
+      label =
+        "Kéo thả file PDF vào đây hoặc click để chọn";
       break;
-    case 'merge':
+    case "merge":
       accept = ".pdf";
-      label = "Kéo thả nhiều file PDF vào đây hoặc click để chọn";
+      label =
+        "Kéo thả nhiều file PDF vào đây hoặc click để chọn";
       break;
-    case 'split':
+    case "split":
       accept = ".pdf";
-      label = "Kéo thả file PDF vào đây hoặc click để chọn";
+      label =
+        "Kéo thả file PDF vào đây hoặc click để chọn";
       break;
-    case 'image-to-pdf':
+    case "image-to-pdf":
       accept = ".jpg,.jpeg,.png";
-      label = "Kéo thả file hình ảnh vào đây hoặc click để chọn";
-      break;
-    case 'ocr':
-      accept = ".pdf,.jpg,.jpeg,.png";
-      label = "Kéo thả file PDF hoặc hình ảnh vào đây hoặc click để chọn";
+      label =
+        "Kéo thả file hình ảnh vào đây hoặc click để chọn";
       break;
   }
 
@@ -107,23 +142,20 @@ function updateButtonText(operation) {
   let text = "Bắt đầu xử lý";
 
   switch (operation) {
-    case 'convert':
+    case "convert":
       text = "Bắt đầu chuyển đổi";
       break;
-    case 'compress':
+    case "compress":
       text = "Bắt đầu nén";
       break;
-    case 'merge':
+    case "merge":
       text = "Bắt đầu gộp";
       break;
-    case 'split':
+    case "split":
       text = "Bắt đầu tách";
       break;
-    case 'image-to-pdf':
+    case "image-to-pdf":
       text = "Chuyển đổi";
-      break;
-    case 'ocr':
-      text = "Trích xuất văn bản";
       break;
   }
 
@@ -139,7 +171,7 @@ function resetFileSelection() {
 
 function getDefaultLabel() {
   switch (currentOperation) {
-    case 'merge':
+    case "merge":
       return "Kéo thả nhiều file PDF vào đây hoặc click để chọn";
     default:
       return "Kéo thả file vào đây hoặc click để chọn";
@@ -152,10 +184,11 @@ function validateOperation() {
   const file = fileInput.files[0];
   const files = filesInput.files;
 
-  if (operation === 'merge') {
+  if (operation === "merge") {
     if (files.length < 2) {
       btnConvert.disabled = true;
-      btnConvert.innerText = "Cần ít nhất 2 file";
+      btnConvert.innerText =
+        "Cần ít nhất 2 file";
       btnConvert.style.backgroundColor = "#ccc";
       btnConvert.style.cursor = "not-allowed";
       fileLabel.style.color = "red";
@@ -169,13 +202,18 @@ function validateOperation() {
   }
 
   // Check specific validations
-  if (operation === 'convert') {
-    const targetFormat = targetFormatSelect.value;
-    const fileExt = file.name.split(".").pop().toLowerCase();
+  if (operation === "convert") {
+    const targetFormat =
+      targetFormatSelect.value;
+    const fileExt = file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
 
     if (fileExt === targetFormat) {
       btnConvert.disabled = true;
-      btnConvert.innerText = "Định dạng không hợp lệ";
+      btnConvert.innerText =
+        "Định dạng không hợp lệ";
       btnConvert.style.backgroundColor = "#ccc";
       btnConvert.style.cursor = "not-allowed";
       fileLabel.style.color = "red";
@@ -192,21 +230,24 @@ function validateOperation() {
 }
 
 // --- Operation card click handlers ---
-operationCards.forEach(card => {
-  card.addEventListener('click', () => {
+operationCards.forEach((card) => {
+  card.addEventListener("click", () => {
     const operation = card.dataset.operation;
     selectOperation(operation);
   });
 });
 
 // Initialize UI on load - select 'convert' by default
-document.addEventListener('DOMContentLoaded', () => {
-  selectOperation('convert');
-});
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    selectOperation("convert");
+  }
+);
 
 // --- Choose file ---
 dropZone.onclick = () => {
-  if (currentOperation === 'merge') {
+  if (currentOperation === "merge") {
     filesInput.click();
   } else {
     fileInput.click();
@@ -216,12 +257,15 @@ dropZone.onclick = () => {
 fileInput.onchange = (e) => {
   if (e.target.files.length > 0) {
     const file = e.target.files[0];
-    const fileExt = file.name.split(".").pop().toLowerCase();
+    const fileExt = file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
 
     fileLabel.innerText = file.name;
 
     // Auto-select target format for convert operation
-    if (currentOperation === 'convert') {
+    if (currentOperation === "convert") {
       if (fileExt === "pdf") {
         targetFormatSelect.value = "docx";
       } else if (fileExt === "docx") {
@@ -255,14 +299,15 @@ btnConvert.onclick = async () => {
 
   let fileName = "";
 
-  if (operation === 'merge') {
+  if (operation === "merge") {
     const files = filesInput.files;
     if (!files || files.length < 2) return;
 
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i]);
     }
-    fileName = mergeOutputName.value || "merged_pdf";
+    fileName =
+      mergeOutputName.value || "merged_pdf";
 
     // Add output name
     formData.append("output_name", fileName);
@@ -275,9 +320,12 @@ btnConvert.onclick = async () => {
   }
 
   // Add operation-specific parameters
-  if (operation === 'convert') {
-    formData.append("format", targetFormatSelect.value);
-  } else if (operation === 'split') {
+  if (operation === "convert") {
+    formData.append(
+      "format",
+      targetFormatSelect.value
+    );
+  } else if (operation === "split") {
     formData.append("pages", splitPages.value);
   }
 
@@ -290,7 +338,9 @@ btnConvert.onclick = async () => {
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      throw new Error(`Xử lý thất bại: ${errorText}`);
+      throw new Error(
+        `Xử lý thất bại: ${errorText}`
+      );
     }
 
     const blob = await resp.blob();
@@ -298,30 +348,37 @@ btnConvert.onclick = async () => {
     // Determine file extension based on operation
     let extension = "";
     switch (operation) {
-      case 'convert':
+      case "convert":
         extension = targetFormatSelect.value;
         break;
-      case 'compress':
+      case "compress":
         extension = "pdf";
         break;
-      case 'merge':
+      case "merge":
         extension = "pdf";
         break;
-      case 'split':
+      case "split":
         extension = "zip";
         break;
-      case 'image-to-pdf':
+      case "image-to-pdf":
         extension = "pdf";
         break;
-      case 'ocr':
+      case "ocr":
         extension = "txt";
         break;
     }
 
     // Create download filename
-    const lastDotIndex = fileName.lastIndexOf(".");
-    const baseName = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
-    const newFileName = operation === 'merge' ? `${fileName}.${extension}` : `${baseName}.${extension}`;
+    const lastDotIndex =
+      fileName.lastIndexOf(".");
+    const baseName =
+      lastDotIndex !== -1
+        ? fileName.substring(0, lastDotIndex)
+        : fileName;
+    const newFileName =
+      operation === "merge"
+        ? `${fileName}.${extension}`
+        : `${baseName}.${extension}`;
 
     downloadBlob(blob, newFileName);
   } catch (err) {
@@ -367,26 +424,30 @@ function showLoader(show) {
 }
 
 // --- Drag and drop handling ---
-dropZone.addEventListener('dragover', (e) => {
+dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
-  dropZone.classList.add('border-indigo-500');
+  dropZone.classList.add("border-indigo-500");
 });
 
-dropZone.addEventListener('dragleave', (e) => {
+dropZone.addEventListener("dragleave", (e) => {
   e.preventDefault();
-  dropZone.classList.remove('border-indigo-500');
+  dropZone.classList.remove(
+    "border-indigo-500"
+  );
 });
 
-dropZone.addEventListener('drop', (e) => {
+dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
-  dropZone.classList.remove('border-indigo-500');
+  dropZone.classList.remove(
+    "border-indigo-500"
+  );
 
   const files = e.dataTransfer.files;
 
-  if (currentOperation === 'merge') {
+  if (currentOperation === "merge") {
     // Handle multiple files for merge
     if (files.length < 2) {
-      alert('Cần ít nhất 2 file để gộp!');
+      alert("Cần ít nhất 2 file để gộp!");
       return;
     }
 
@@ -414,7 +475,8 @@ dropZone.addEventListener('drop', (e) => {
 });
 
 function downloadBlob(blob, filename) {
-  const url = globalThis.URL.createObjectURL(blob);
+  const url =
+    globalThis.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.style.display = "none";
   a.href = url;

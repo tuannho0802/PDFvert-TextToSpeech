@@ -117,7 +117,7 @@ try:
             for i in range(total_pages):
                 writer = PyPDF2.PdfWriter()
                 writer.add_page(reader.pages[i])
-                output_path = r'%s/%s_page_%d.pdf'
+                output_path = r'%s/%s_page_' + str(i + 1) + '.pdf'
                 writer.write(output_path)
                 writer.close()
         else:
@@ -127,7 +127,7 @@ try:
                     continue
                 writer = PyPDF2.PdfWriter()
                 writer.add_page(reader.pages[page_num - 1])  # Convert to 0-based index
-                output_path = r'%s/%s_page_%d.pdf'
+                output_path = r'%s/%s_page_' + str(page_num) + '.pdf'
                 writer.write(output_path)
                 writer.close()
 
@@ -135,7 +135,7 @@ try:
 except Exception as e:
     print(f"Error splitting PDF: {e}", file=sys.stderr)
     sys.exit(1)
-`, absInput, fmt.Sprintf("%v", pages), absOutputDir, nameWithoutExt, "%d", absOutputDir, nameWithoutExt, "%d")
+`, absInput, fmt.Sprintf("%v", pages), absOutputDir, nameWithoutExt)
 
 	cmd := exec.Command("python", "-c", script)
 	output, err := cmd.CombinedOutput()
@@ -182,82 +182,6 @@ except Exception as e:
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("lỗi chuyển đổi hình ảnh sang PDF: %v | Log: %s", err, string(output))
-	}
-
-	return finalPath, nil
-}
-
-// ExtractTextWithOCR extracts text from images/PDFs using OCR
-func ExtractTextWithOCR(inputPath string, outputDir string) (string, error) {
-	absInput, _ := filepath.Abs(inputPath)
-	absOutputDir, _ := filepath.Abs(outputDir)
-
-	ext := filepath.Ext(absInput)
-	nameWithoutExt := filepath.Base(absInput[:len(absInput)-len(ext)])
-	finalPath := filepath.Join(absOutputDir, nameWithoutExt+"_ocr.txt")
-
-	fmt.Printf("Đang trích xuất văn bản bằng OCR: %s\n", nameWithoutExt)
-
-	var script string
-
-	if ext == ".pdf" {
-		// OCR for PDF files
-		script = fmt.Sprintf(`
-import pytesseract
-import fitz
-import sys
-
-try:
-    text = ""
-    doc = fitz.open(r'%s')
-
-    for page_num in range(len(doc)):
-        page = doc.load_page(page_num)
-        pix = page.get_pixmap()
-        img_path = r'%s/temp_page_%d.png' %% page_num
-        pix.save(img_path)
-
-        # OCR the image
-        page_text = pytesseract.image_to_string(img_path)
-        text += f"--- Trang {page_num + 1} ---\n{page_text}\n\n"
-
-    doc.close()
-
-    # Save extracted text
-    with open(r'%s', 'w', encoding='utf-8') as f:
-        f.write(text)
-
-    print("OCR extraction from PDF completed successfully")
-except Exception as e:
-    print(f"Error extracting text from PDF: {e}", file=sys.stderr)
-    sys.exit(1)
-`, absInput, absOutputDir, finalPath)
-	} else {
-		// OCR for image files
-		script = fmt.Sprintf(`
-import pytesseract
-from PIL import Image
-import sys
-
-try:
-    img = Image.open(r'%s')
-    text = pytesseract.image_to_string(img)
-
-    # Save extracted text
-    with open(r'%s', 'w', encoding='utf-8') as f:
-        f.write(text)
-
-    print("OCR extraction from image completed successfully")
-except Exception as e:
-    print(f"Error extracting text from image: {e}", file=sys.stderr)
-    sys.exit(1)
-`, absInput, finalPath)
-	}
-
-	cmd := exec.Command("python", "-c", script)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("lỗi trích xuất văn bản bằng OCR: %v | Log: %s", err, string(output))
 	}
 
 	return finalPath, nil
