@@ -82,6 +82,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 │   └── tts.go
 ├── static
 │   ├── script.js
+│   ├── tts.js
 │   └── style.css
 ├── templates
 │   └── index.html
