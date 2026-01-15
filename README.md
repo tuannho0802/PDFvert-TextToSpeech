@@ -10,7 +10,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 -   **✂️ PDF Split:** Split PDF files into separate pages or selected page ranges.
 -   **🖼️ Image to PDF:** Convert image files (JPG, PNG) to PDF format.
 -   **📝 OCR Text Extraction:** Extract text from images using client-side Tesseract.js v5 (English support only).
--   **🗣️ Text-to-Speech:** Convert text into natural-sounding speech (MP3).
+-   **🗣️ Text-to-Speech:** Convert text into natural-sounding speech (MP3) with language selection, audio preview, and professional controls.
 -   **💨 Drag & Drop:** Easily upload files using a drag-and-drop interface.
 -   **🧹 Auto-Cleanup:** Automatically deletes old files from the server to save space.
 -   **📱 Responsive UI:** The user interface is designed to work on both desktop and mobile devices.
