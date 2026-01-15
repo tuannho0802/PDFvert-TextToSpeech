@@ -26,7 +26,7 @@ func HandleTTS(c *gin.Context) {
 		voice = "vi-VN-HoaiMyNeural"
 	}
 	if rate == "" {
-		rate = "0"
+		rate = "+0%"
 	}
 
 	// Create file name and path (same pattern as converter)

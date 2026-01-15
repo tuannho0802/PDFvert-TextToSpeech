@@ -321,30 +321,47 @@
             placeholder="Nhập văn bản tiếng Việt tại đây..."
           ></textarea>
 
-          <!-- Voice Selection (gTTS) -->
+          <!-- Voice Selection (edge-tts) -->
           <div class="mt-4">
             <label class="block text-sm font-medium text-slate-700 mb-2">
-              Ngôn ngữ giọng đọc (gTTS):
+              Giọng đọc (edge-tts):
             </label>
             <select
               id="tts-voice"
               class="w-full p-2 rounded-lg border border-slate-300 focus:ring-emerald-500"
             >
-              <option value="vi-VN-HoaiMyNeural">Tiếng Việt</option>
-              <option value="en-US">English (US)</option>
+              <optgroup label="Tiếng Việt">
+                <option value="vi-VN-HoaiMyNeural">Hoài My (Nữ) - Neural</option>
+                <option value="vi-VN-NamMinhNeural">Nam Minh (Nam) - Neural</option>
+              </optgroup>
+              <optgroup label="English">
+                <option value="en-US-AriaNeural">Aria (Female) - Neural</option>
+                <option value="en-US-GuyNeural">Guy (Male) - Neural</option>
+              </optgroup>
             </select>
             <p class="text-xs text-slate-500 mt-1">
-              gTTS sử dụng giọng đọc tự nhiên cho từng ngôn ngữ
+              edge-tts sử dụng công nghệ giọng nói neural chất lượng cao
             </p>
           </div>
 
-          <!-- Rate Control (Future) -->
+          <!-- Rate Control -->
           <div class="mt-4">
             <label class="block text-sm font-medium text-slate-700 mb-2">
-              Tốc độ:
+              Tốc độ: <span id="rate-value">0%</span>
             </label>
-            <div class="w-full p-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-sm">
-              Tốc độ bình thường (hỗ trợ tốc độ nâng cao sắp tới)
+            <input
+              type="range"
+              id="tts-rate"
+              min="-50"
+              max="50"
+              value="0"
+              step="5"
+              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div class="flex justify-between text-xs text-slate-500 mt-1">
+              <span>-50%</span>
+              <span>0%</span>
+              <span>+50%</span>
             </div>
           </div>
 

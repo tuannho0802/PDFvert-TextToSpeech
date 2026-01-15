@@ -2,58 +2,48 @@ package services
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"strings"
 )
 
-// GenerateSpeech creates MP3 file with voice and rate options
-// Currently uses gTTS (Google Text-to-Speech) as a reliable fallback
-// Parameters voice and rate are accepted for future compatibility
+// GenerateSpeech creates MP3 file using edge-tts with high-quality neural voices
 func GenerateSpeech(text string, outputPath string, voice string, rate string) error {
-    // For now, use gTTS which is more reliable than edge-tts
-    // gTTS supports Vietnamese language but not specific voices or rate control
-    // We keep the voice/rate parameters for future compatibility
-
-    // Determine language based on voice selection
-    lang := "vi" // Default to Vietnamese
-    if voice == "en-US" {
-        lang = "en"
+    // Validate voice parameter - default to Vietnamese female voice if not provided
+    if voice == "" {
+        voice = "vi-VN-HoaiMyNeural"
     }
 
-    // gTTS doesn't support rate control, but we accept the parameter for future use
-    // For now, we'll use normal speed
-    _ = rate // Mark as used for future compatibility
+    // Validate and format rate parameter for edge-tts (expects format like "+0%", "-10%", "+25%")
+    if rate == "" {
+        rate = "+0%"
+    }
 
-    // Build gTTS command
-    script := fmt.Sprintf(`
-import gtts
-import sys
-import os
+    // Ensure rate has the % suffix if not present
+    if !strings.Contains(rate, "%") {
+        rate = rate + "%"
+    }
 
-text = """%s"""
-lang = "%s"
-output_path = r"""%s"""
+    // Build edge-tts command with UTF-8 encoding support
+    // Use python -m edge_tts for proper module execution
+    cmd := exec.Command("python", "-m", "edge_tts",
+        "--voice", voice,
+        "--rate", rate,
+        "--text", text,
+        "--write-media", outputPath)
 
-try:
-    # Create gTTS object
-    tts = gtts.gTTS(text=text, lang=lang, slow=False)
-
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-    # Save to file
-    tts.save(output_path)
-
-    print("gTTS completed successfully")
-except Exception as e:
-    print("gTTS error:", str(e), file=sys.stderr)
-    sys.exit(1)
-`, text, lang, outputPath)
-
-    cmd := exec.Command("python", "-c", script)
+    // Set UTF-8 environment for proper Vietnamese character handling
+    cmd.Env = append(os.Environ(), "PYTHONUTF8=1")
 
     output, err := cmd.CombinedOutput()
     if err != nil {
-        return fmt.Errorf("lỗi TTS với gTTS: %v, chi tiết: %s", err, string(output))
+        return fmt.Errorf("lỗi TTS với edge-tts: %v, chi tiết: %s", err, string(output))
     }
+
+    // Verify the file was actually created
+    if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+        return fmt.Errorf("file TTS không được tạo thành công: %s", outputPath)
+    }
+
     return nil
 }

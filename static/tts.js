@@ -1,23 +1,14 @@
 // --- Handle TTS ---
 // Get TTS UI elements
-const btnTTS =
-  document.getElementById("btn-tts");
-const ttsVoice =
-  document.getElementById("tts-voice");
-const audioPreview = document.getElementById(
-  "audio-preview"
-);
-const ttsAudio =
-  document.getElementById("tts-audio");
-const btnPreview = document.getElementById(
-  "btn-preview"
-);
-const btnDownload = document.getElementById(
-  "btn-download"
-);
-const btnGenerateNew = document.getElementById(
-  "btn-generate-new"
-);
+const btnTTS = document.getElementById("btn-tts");
+const ttsVoice = document.getElementById("tts-voice");
+const ttsRate = document.getElementById("tts-rate");
+const rateValue = document.getElementById("rate-value");
+const audioPreview = document.getElementById("audio-preview");
+const ttsAudio = document.getElementById("tts-audio");
+const btnPreview = document.getElementById("btn-preview");
+const btnDownload = document.getElementById("btn-download");
+const btnGenerateNew = document.getElementById("btn-generate-new");
 
 // Store current audio blob
 let currentAudioBlob = null;
@@ -25,15 +16,18 @@ let currentAudioBlob = null;
 // Initialize preview button as disabled
 btnPreview.disabled = true;
 
+// Update rate value display
+ttsRate.addEventListener("input", () => {
+  const value = ttsRate.value;
+  rateValue.textContent = value + "%";
+});
+
 btnTTS.onclick = async () => {
-  const text =
-    document.getElementById("tts-text").value;
-  if (!text)
-    return alert("Vui lòng nhập văn bản!");
+  const text = document.getElementById("tts-text").value;
+  if (!text) return alert("Vui lòng nhập văn bản!");
 
   const voice = ttsVoice.value;
-  // gTTS doesn't support rate control yet, but we send it for future compatibility
-  const rate = "+0%";
+  const rate = ttsRate.value + "%";
 
   const formData = new FormData();
   formData.append("text", text);
