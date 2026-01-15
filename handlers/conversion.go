@@ -29,7 +29,7 @@ func HandleConversion(c *gin.Context) {
 	os.MkdirAll(absOutputDir, os.ModePerm)
 
 	var resultPath string
-	var err error = fmt.Errorf("uninitialized")
+	var err error = nil
 
 	switch operation {
 	case "compress":

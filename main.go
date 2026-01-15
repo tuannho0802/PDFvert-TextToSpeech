@@ -48,7 +48,7 @@ func main() {
 	// Create the uploads folder if it doesn't exist
 	os.MkdirAll(uploadDir, os.ModePerm)
 
-	startCleanupWorker("./uploads", 5*time.Minute)
+	startCleanupWorker("./uploads", 1*time.Minute)
 
 	r := gin.Default()
 
