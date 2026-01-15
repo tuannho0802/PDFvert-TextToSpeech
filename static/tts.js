@@ -53,8 +53,14 @@ btnTTS.onclick = async () => {
   // Always include sign for edge-tts compatibility
   const rateValue = parseInt(ttsRate.value);
   const pitchValue = parseInt(ttsPitch.value);
-  const rate = (rateValue >= 0 ? "+" : "") + rateValue + "%";
-  const pitch = (pitchValue >= 0 ? "+" : "") + pitchValue + "Hz";
+  const rate =
+    (rateValue >= 0 ? "+" : "") +
+    rateValue +
+    "%";
+  const pitch =
+    (pitchValue >= 0 ? "+" : "") +
+    pitchValue +
+    "Hz";
 
   const formData = new FormData();
   formData.append("text", text);
