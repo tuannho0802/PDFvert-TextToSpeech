@@ -94,6 +94,7 @@ function updateSelectedOperationDisplay(
     merge: "Gộp PDF",
     split: "Tách PDF",
     "image-to-pdf": "Hình ảnh sang PDF",
+    ocr: "Trích xuất văn bản (OCR)",
   };
 
   selectedOperationText.textContent =
@@ -131,6 +132,11 @@ function updateFileInput(operation) {
       label =
         "Kéo thả file hình ảnh vào đây hoặc click để chọn";
       break;
+    case "ocr":
+      accept = ".jpg,.jpeg,.png";
+      label =
+        "Kéo thả file ảnh vào đây hoặc click để chọn";
+      break;
   }
 
   fileInput.accept = accept;
@@ -156,6 +162,9 @@ function updateButtonText(operation) {
       break;
     case "image-to-pdf":
       text = "Chuyển đổi";
+      break;
+    case "ocr":
+      text = "Trích xuất văn bản";
       break;
   }
 
@@ -294,6 +303,13 @@ targetFormatSelect.onchange = validateOperation;
 // --- Convert file ---
 btnConvert.onclick = async () => {
   const operation = currentOperation;
+
+  // Special handling for OCR - client-side processing
+  if (operation === "ocr") {
+    await handleOCR();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("operation", operation);
 
@@ -418,9 +434,175 @@ btnTTS.onclick = async () => {
   }
 };
 
+// --- OCR Processing ---
+async function handleOCR() {
+  const file = fileInput.files[0];
+  if (!file)
+    return alert("Vui lòng chọn file trước!");
+
+  // Check network connectivity first
+  try {
+    await fetch("https://unpkg.com/", {
+      mode: "no-cors",
+      timeout: 5000,
+    });
+  } catch (e) {
+    alert(
+      "Không thể kết nối tới CDN. Vui lòng kiểm tra kết nối internet."
+    );
+    return;
+  }
+
+  // Check if Tesseract.js is available
+  if (typeof Tesseract === "undefined") {
+    alert(
+      "Tesseract.js chưa được tải. Có thể do:\n1. Kết nối internet chậm\n2. Firewall chặn CDN\n3. Browser không hỗ trợ\n\nVui lòng thử:\n- Refresh trang (F5)\n- Kiểm tra kết nối internet\n- Tắt VPN hoặc proxy\n- Sử dụng Chrome/Edge browser"
+    );
+    return;
+  }
+
+  // Show OCR-specific loading message
+  showLoader(
+    true,
+    "Đang tải OCR... (10-60 giây lần đầu, tải mô hình nhận diện chữ)"
+  );
+
+  try {
+    // Only support images for OCR
+    if (!file.type.startsWith("image/")) {
+      throw new Error(
+        "OCR chỉ hỗ trợ file ảnh (JPG, PNG). Vui lòng chọn file ảnh."
+      );
+    }
+
+    console.log("Starting OCR processing...");
+    const extractedText = await performOCR(
+      file
+    );
+
+    console.log(
+      "OCR completed, sending to server..."
+    );
+    showLoader(
+      true,
+      "Đang gửi kết quả lên server..."
+    );
+
+    // Send extracted text to server
+    await sendOCRTextToServer(
+      extractedText,
+      file.name
+    );
+  } catch (error) {
+    console.error(
+      "OCR processing failed:",
+      error
+    );
+    alert(`Lỗi OCR: ${error.message}`);
+  } finally {
+    showLoader(false);
+  }
+}
+
+async function performOCR(imageFile) {
+  try {
+    console.log(
+      "Starting OCR processing with Tesseract.js v5..."
+    );
+
+    showLoader(
+      true,
+      "Đang tải mô hình OCR... (10-30 giây lần đầu)"
+    );
+
+    // Create Tesseract worker for better control
+    const worker =
+      await Tesseract.createWorker();
+
+    try {
+      showLoader(
+        true,
+        "Đang khởi tạo engine OCR..."
+      );
+
+      // Load Vietnamese language for better Vietnamese text recognition
+      await worker.loadLanguage("vie");
+      await worker.initialize("vie");
+
+      showLoader(
+        true,
+        "Đang nhận diện văn bản..."
+      );
+
+      // Perform OCR
+      const {
+        data: { text },
+      } = await worker.recognize(imageFile);
+
+      console.log("OCR result:", text);
+
+      return text || "No text found in image";
+    } finally {
+      // Always terminate the worker
+      await worker.terminate();
+    }
+  } catch (error) {
+    console.error("OCR Error:", error);
+    throw new Error(
+      `Không thể nhận diện văn bản: ${error.message}`
+    );
+  }
+}
+
+async function sendOCRTextToServer(
+  text,
+  originalFileName
+) {
+  const formData = new FormData();
+  formData.append("operation", "ocr");
+  formData.append("text", text);
+  formData.append("filename", originalFileName);
+
+  const response = await fetch("/api/convert", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `Lỗi từ server: ${errorText}`
+    );
+  }
+
+  const blob = await response.blob();
+  const baseName =
+    originalFileName.split(".")[0];
+  downloadBlob(blob, `${baseName}_ocr.txt`);
+}
+
 // --- Helpers functions ---
-function showLoader(show) {
+function showLoader(
+  show,
+  customMessage = null
+) {
   loader.classList.toggle("hidden", !show);
+
+  if (show && customMessage) {
+    const messageElement =
+      loader.querySelector("span");
+    if (messageElement) {
+      messageElement.textContent =
+        customMessage;
+    }
+  } else if (show) {
+    const messageElement =
+      loader.querySelector("span");
+    if (messageElement) {
+      messageElement.textContent =
+        "Đang xử lý, vui lòng đợi...";
+    }
+  }
 }
 
 // --- Drag and drop handling ---

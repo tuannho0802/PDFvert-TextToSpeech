@@ -165,6 +165,24 @@ func HandleConversion(c *gin.Context) {
 		fmt.Printf("Đang chuyển đổi: %s -> %s\n", file.Filename, targetFormat)
 		resultPath, err = services.ConvertFile(srcPath, absOutputDir, targetFormat)
 
+	case "ocr":
+		// OCR Text Processing - receive extracted text from client
+		text := c.PostForm("text")
+		filename := c.PostForm("filename")
+
+		if text == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Không nhận được văn bản OCR"})
+			return
+		}
+
+		if filename == "" {
+			filename = "ocr_result"
+		}
+
+		// Save the extracted text to a file
+		resultPath = filepath.Join(absOutputDir, filename+"_ocr.txt")
+		err = os.WriteFile(resultPath, []byte(text), 0644)
+
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Operation không được hỗ trợ"})
 		err = fmt.Errorf("operation not supported")

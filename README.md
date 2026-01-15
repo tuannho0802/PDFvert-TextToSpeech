@@ -9,6 +9,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 -   **🔗 PDF Merge:** Combine multiple PDF files into one.
 -   **✂️ PDF Split:** Split PDF files into separate pages or selected page ranges.
 -   **🖼️ Image to PDF:** Convert image files (JPG, PNG) to PDF format.
+-   **📝 OCR Text Extraction:** Extract text from images using client-side Tesseract.js v5 (English support only).
 -   **🗣️ Text-to-Speech:** Convert text into natural-sounding speech (MP3).
 -   **💨 Drag & Drop:** Easily upload files using a drag-and-drop interface.
 -   **🧹 Auto-Cleanup:** Automatically deletes old files from the server to save space.
@@ -18,7 +19,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 
 -   **Backend:** Go (with Gin framework)
 -   **Frontend:** HTML, CSS (with Tailwind CSS), and JavaScript
--   **PDF Processing:** Python (with PyMuPDF, PyPDF2, Pillow)
+-   **PDF Processing:** Python (with PyMuPDF, PyPDF2, Pillow) + Client-side OCR (Tesseract.js v5)
 -   **File Conversion:** Python (with `pdf2docx` and `docx2pdf` libraries)
 -   **Text-to-Speech:** Python (with `edge-tts` library)
 -   **Containerization:** Docker
@@ -50,6 +51,15 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
     go run main.go
     ```
 5.  Open your browser and navigate to `http://localhost:8080`.
+
+### 📝 OCR Usage Notes
+
+- **Client-side Processing**: OCR runs entirely in your browser - no server load or API costs
+- **First-time Setup**: Initial OCR may take 10-30 seconds to download English language models
+- **Performance**: Subsequent OCR operations are much faster (2-5 seconds)
+- **Language Support**: English text recognition only
+- **File Types**: Supports JPG, PNG images only (no PDFs)
+- **Privacy**: Images never leave your browser - complete privacy protection
 
 ## 📡 API Endpoints
 
