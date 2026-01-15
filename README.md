@@ -5,6 +5,11 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 ## ✨ Features
 
 -   **📄 File Conversion:** Convert PDF files to DOCX and DOCX files to PDF.
+-   **🗜️ PDF Compression:** Compress PDF files to reduce file size.
+-   **🔗 PDF Merge:** Combine multiple PDF files into one.
+-   **✂️ PDF Split:** Split PDF files into separate pages or selected page ranges.
+-   **🖼️ Image to PDF:** Convert image files (JPG, PNG) to PDF format.
+-   **📝 OCR Text Extraction:** Extract text from scanned PDFs or images using OCR.
 -   **🗣️ Text-to-Speech:** Convert text into natural-sounding speech (MP3).
 -   **💨 Drag & Drop:** Easily upload files using a drag-and-drop interface.
 -   **🧹 Auto-Cleanup:** Automatically deletes old files from the server to save space.
@@ -14,6 +19,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 
 -   **Backend:** Go (with Gin framework)
 -   **Frontend:** HTML, CSS (with Tailwind CSS), and JavaScript
+-   **PDF Processing:** Python (with PyMuPDF, PyPDF2, Pillow, pytesseract libraries)
 -   **File Conversion:** Python (with `pdf2docx` and `docx2pdf` libraries)
 -   **Text-to-Speech:** Python (with `edge-tts` library)
 -   **Containerization:** Docker
@@ -24,7 +30,8 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 
 -   Go (version 1.21 or later)
 -   Python (version 3.11 or later)
--   `pdf2docx`, `docx2pdf`, and `edge-tts` Python libraries
+-   Required Python libraries: PyMuPDF, PyPDF2, Pillow, pytesseract, pdf2docx, docx2pdf, edge-tts
+-   For OCR functionality: Tesseract OCR engine (download from https://github.com/UB-Mannheim/tesseract/wiki)
 
 ### ⚙️ Installation
 
@@ -34,13 +41,21 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
     ```
 2.  Install the required Python libraries:
     ```bash
-    pip install pdf2docx docx2pdf edge-tts
+    pip install -r requirements.txt
     ```
-3.  Run the application:
+    Or manually:
+    ```bash
+    pip install PyMuPDF PyPDF2 Pillow pytesseract pdf2docx docx2pdf edge-tts
+    ```
+3.  For OCR functionality, install Tesseract OCR:
+    - Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki and add to PATH
+    - Linux: `sudo apt-get install tesseract-ocr`
+    - macOS: `brew install tesseract`
+4.  Run the application:
     ```bash
     go run main.go
     ```
-4.  Open your browser and navigate to `http://localhost:8080`.
+5.  Open your browser and navigate to `http://localhost:8080`.
 
 ## 📡 API Endpoints
 

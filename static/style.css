@@ -21,3 +21,77 @@ textarea::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
+
+/* Operation Cards */
+.operation-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.operation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.operation-card.selected {
+  border-color: #4f46e5 !important;
+  background-color: #eef2ff !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.operation-card .text-3xl {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Selected operation indicator */
+#selected-operation {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced file drop zone */
+#drop-zone {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#drop-zone:hover {
+  border-color: #4f46e5;
+  background-color: #f8fafc;
+}
+
+/* Card click animation */
+.operation-card:active {
+  transform: scale(0.95);
+}
+
+/* Smooth transitions for all interactive elements */
+button, input, select, .operation-card {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus styles for accessibility */
+.operation-card:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Responsive grid improvements */
+@media (max-width: 768px) {
+  .operation-card {
+    padding: 1rem;
+  }
+
+  .operation-card .text-3xl {
+    font-size: 2rem;
+  }
+}
