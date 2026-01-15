@@ -21,7 +21,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 -   **Frontend:** HTML, CSS (with Tailwind CSS), and JavaScript
 -   **PDF Processing:** Python (with PyMuPDF, PyPDF2, Pillow) + Client-side OCR (Tesseract.js v5)
 -   **File Conversion:** Python (with `pdf2docx` and `docx2pdf` libraries)
--   **Text-to-Speech:** Python (with `edge-tts` library)
+-   **Text-to-Speech:** Python (with `gTTS` library)
 -   **Containerization:** Docker
 
 ## 🚀 Getting Started
@@ -30,7 +30,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
 
 -   Go (version 1.21 or later)
 -   Python (version 3.11 or later)
--   Required Python libraries: PyMuPDF, PyPDF2, Pillow, pdf2docx, docx2pdf, edge-tts
+-   Required Python libraries: PyMuPDF, PyPDF2, Pillow, pdf2docx, docx2pdf, gTTS
 
 ### ⚙️ Installation
 
@@ -44,7 +44,7 @@ PDFvert & TTS Pro is a web-based application that allows you to convert files be
     ```
     Or manually:
     ```bash
-    pip install PyMuPDF PyPDF2 Pillow pdf2docx docx2pdf edge-tts
+    pip install PyMuPDF PyPDF2 Pillow pdf2docx docx2pdf gTTS
     ```
 4.  Run the application:
     ```bash

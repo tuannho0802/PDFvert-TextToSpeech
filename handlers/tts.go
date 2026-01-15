@@ -13,17 +13,28 @@ import (
 
 func HandleTTS(c *gin.Context) {
 	text := c.PostForm("text")
+	voice := c.PostForm("voice")
+	rate := c.PostForm("rate")
+
 	if text == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Nội dung văn bản không được trống"})
 		return
 	}
 
-	// Create file name and path
+	// Set defaults if not provided
+	if voice == "" {
+		voice = "vi-VN-HoaiMyNeural"
+	}
+	if rate == "" {
+		rate = "0"
+	}
+
+	// Create file name and path (same pattern as converter)
 	fileName := fmt.Sprintf("tts_%d.mp3", time.Now().UnixNano())
 	filePath := filepath.Join("./uploads", fileName)
 
-	// Call service to generate speech
-	err := services.GenerateSpeech(text, filePath)
+	// Call service to generate speech with voice and rate
+	err := services.GenerateSpeech(text, filePath, voice, rate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -32,5 +43,5 @@ func HandleTTS(c *gin.Context) {
 	// Return the generated file
 	c.File(filePath)
 
-	// Note: Temporary file deletion will be handled by middleware/cronjob later
+	// Note: File cleanup will be handled by the 5-minute auto-cleanup worker
 }

@@ -320,6 +320,64 @@
             class="w-full p-3 rounded-xl border border-slate-300 focus:ring-indigo-500"
             placeholder="Nhập văn bản tiếng Việt tại đây..."
           ></textarea>
+
+          <!-- Voice Selection (gTTS) -->
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Ngôn ngữ giọng đọc (gTTS):
+            </label>
+            <select
+              id="tts-voice"
+              class="w-full p-2 rounded-lg border border-slate-300 focus:ring-emerald-500"
+            >
+              <option value="vi-VN-HoaiMyNeural">Tiếng Việt</option>
+              <option value="en-US">English (US)</option>
+            </select>
+            <p class="text-xs text-slate-500 mt-1">
+              gTTS sử dụng giọng đọc tự nhiên cho từng ngôn ngữ
+            </p>
+          </div>
+
+          <!-- Rate Control (Future) -->
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Tốc độ:
+            </label>
+            <div class="w-full p-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-sm">
+              Tốc độ bình thường (hỗ trợ tốc độ nâng cao sắp tới)
+            </div>
+          </div>
+
+          <!-- Audio Preview -->
+          <div id="audio-preview" class="mt-4 hidden">
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Nghe thử:
+            </label>
+            <audio id="tts-audio" controls class="w-full">
+              Trình duyệt của bạn không hỗ trợ thẻ audio.
+            </audio>
+            <div class="flex gap-2 mt-2">
+              <button
+                id="btn-preview"
+                class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-all text-sm"
+              >
+                🔊 Nghe thử
+              </button>
+              <button
+                id="btn-download"
+                class="flex-1 bg-slate-600 text-white py-2 rounded-lg font-medium hover:bg-slate-700 transition-all text-sm"
+              >
+                Tải xuống MP3
+              </button>
+              <button
+                id="btn-generate-new"
+                class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-all text-sm"
+              >
+                Tạo mới
+              </button>
+            </div>
+          </div>
+
           <button
             id="btn-tts"
             class="w-full mt-6 bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-all disabled:bg-slate-400"
