@@ -3,12 +3,27 @@
 const btnTTS = document.getElementById("btn-tts");
 const ttsVoice = document.getElementById("tts-voice");
 const ttsRate = document.getElementById("tts-rate");
-const rateValue = document.getElementById("rate-value");
-const audioPreview = document.getElementById("audio-preview");
-const ttsAudio = document.getElementById("tts-audio");
-const btnPreview = document.getElementById("btn-preview");
-const btnDownload = document.getElementById("btn-download");
-const btnGenerateNew = document.getElementById("btn-generate-new");
+const ttsPitch =
+  document.getElementById("tts-pitch");
+const rateValue =
+  document.getElementById("rate-value");
+const pitchValue = document.getElementById(
+  "pitch-value"
+);
+const audioPreview = document.getElementById(
+  "audio-preview"
+);
+const ttsAudio =
+  document.getElementById("tts-audio");
+const btnPreview = document.getElementById(
+  "btn-preview"
+);
+const btnDownload = document.getElementById(
+  "btn-download"
+);
+const btnGenerateNew = document.getElementById(
+  "btn-generate-new"
+);
 
 // Store current audio blob
 let currentAudioBlob = null;
@@ -22,17 +37,30 @@ ttsRate.addEventListener("input", () => {
   rateValue.textContent = value + "%";
 });
 
+// Update pitch value display
+ttsPitch.addEventListener("input", () => {
+  const value = ttsPitch.value;
+  pitchValue.textContent = value + "Hz";
+});
+
 btnTTS.onclick = async () => {
-  const text = document.getElementById("tts-text").value;
-  if (!text) return alert("Vui lòng nhập văn bản!");
+  const text =
+    document.getElementById("tts-text").value;
+  if (!text)
+    return alert("Vui lòng nhập văn bản!");
 
   const voice = ttsVoice.value;
-  const rate = ttsRate.value + "%";
+  // Always include sign for edge-tts compatibility
+  const rateValue = parseInt(ttsRate.value);
+  const pitchValue = parseInt(ttsPitch.value);
+  const rate = (rateValue >= 0 ? "+" : "") + rateValue + "%";
+  const pitch = (pitchValue >= 0 ? "+" : "") + pitchValue + "Hz";
 
   const formData = new FormData();
   formData.append("text", text);
   formData.append("voice", voice);
   formData.append("rate", rate);
+  formData.append("pitch", pitch);
 
   showLoader(true, "Đang tạo giọng nói...");
   try {

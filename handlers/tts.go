@@ -15,6 +15,7 @@ func HandleTTS(c *gin.Context) {
 	text := c.PostForm("text")
 	voice := c.PostForm("voice")
 	rate := c.PostForm("rate")
+	pitch := c.PostForm("pitch")
 
 	if text == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Nội dung văn bản không được trống"})
@@ -28,13 +29,16 @@ func HandleTTS(c *gin.Context) {
 	if rate == "" {
 		rate = "+0%"
 	}
+	if pitch == "" {
+		pitch = "+0Hz"
+	}
 
 	// Create file name and path (same pattern as converter)
 	fileName := fmt.Sprintf("tts_%d.mp3", time.Now().UnixNano())
 	filePath := filepath.Join("./uploads", fileName)
 
-	// Call service to generate speech with voice and rate
-	err := services.GenerateSpeech(text, filePath, voice, rate)
+	// Call service to generate speech with voice, rate, and pitch
+	err := services.GenerateSpeech(text, filePath, voice, rate, pitch)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
