@@ -1,8 +1,19 @@
 // --- Handle TTS ---
 // Get TTS UI elements
-const btnTTS = document.getElementById("btn-tts");
-const ttsVoice = document.getElementById("tts-voice");
-const ttsRate = document.getElementById("tts-rate");
+const ttsCard = document.querySelector(
+  ".main-container > div:last-child"
+); // Assuming the last card is the TTS card
+const btnTTS =
+  document.getElementById("btn-tts");
+const ttsText =
+  document.getElementById("tts-text");
+const btnCopyText = document.getElementById(
+  "btn-copy-text"
+);
+const ttsVoice =
+  document.getElementById("tts-voice");
+const ttsRate =
+  document.getElementById("tts-rate");
 const ttsPitch =
   document.getElementById("tts-pitch");
 const rateValue =
@@ -31,6 +42,46 @@ let currentAudioBlob = null;
 // Initialize preview button as disabled
 btnPreview.disabled = true;
 
+// --- Event Listeners ---
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    if (window.animation) {
+      // Apply button animations
+      window.animation.applyButtonPressEffect(
+        btnTTS
+      );
+      window.animation.applyButtonHoverGlow(
+        btnTTS
+      );
+      window.animation.applyButtonPressEffect(
+        btnPreview
+      );
+      window.animation.applyButtonHoverGlow(
+        btnPreview
+      );
+      window.animation.applyButtonPressEffect(
+        btnDownload
+      );
+      window.animation.applyButtonHoverGlow(
+        btnDownload
+      );
+      window.animation.applyButtonPressEffect(
+        btnGenerateNew
+      );
+      window.animation.applyButtonHoverGlow(
+        btnGenerateNew
+      );
+      window.animation.applyButtonPressEffect(
+        btnCopyText
+      );
+      window.animation.applyButtonHoverGlow(
+        btnCopyText
+      );
+    }
+  }
+);
+
 // Update rate value display
 ttsRate.addEventListener("input", () => {
   const value = ttsRate.value;
@@ -43,11 +94,32 @@ ttsPitch.addEventListener("input", () => {
   pitchValue.textContent = value + "Hz";
 });
 
+// Copy text to clipboard
+btnCopyText.onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(
+      ttsText.value
+    );
+    window.animation.showToast(
+      "Văn bản đã được sao chép!",
+      "success"
+    );
+  } catch (err) {
+    console.error("Failed to copy text:", err);
+    window.animation.showToast(
+      "Không thể sao chép văn bản.",
+      "error"
+    );
+  }
+};
+
 btnTTS.onclick = async () => {
-  const text =
-    document.getElementById("tts-text").value;
+  const text = ttsText.value;
   if (!text)
-    return alert("Vui lòng nhập văn bản!");
+    return window.animation.showToast(
+      "Vui lòng nhập văn bản!",
+      "error"
+    );
 
   const voice = ttsVoice.value;
   // Always include sign for edge-tts compatibility
@@ -75,7 +147,10 @@ btnTTS.onclick = async () => {
       body: formData,
     });
     if (!resp.ok)
-      throw new Error("Tạo giọng nói thất bại");
+      window.animation.showToast(
+        "Tạo giọng nói thất bại",
+        "error"
+      );
 
     const blob = await resp.blob();
 
@@ -86,8 +161,18 @@ btnTTS.onclick = async () => {
     const audioUrl = URL.createObjectURL(blob);
     ttsAudio.src = audioUrl;
 
-    // Show audio preview section
-    audioPreview.classList.remove("hidden");
+    // Animate audio player appearance
+    if (
+      window.animation &&
+      window.animation.animateAudioPlayer
+    ) {
+      window.animation.animateAudioPlayer(
+        audioPreview,
+        true
+      );
+    } else {
+      audioPreview.classList.remove("hidden");
+    }
 
     // Update preview button text to indicate audio is ready
     btnPreview.textContent = "🔊 Nghe thử";
@@ -98,7 +183,10 @@ btnTTS.onclick = async () => {
       // Ignore autoplay errors (browsers may block autoplay)
     });
   } catch (err) {
-    alert(err.message);
+    window.animation.showToast(
+      err.message,
+      "error"
+    );
   } finally {
     showLoader(false);
   }
@@ -132,9 +220,77 @@ btnDownload.onclick = () => {
 
 // Generate new button
 btnGenerateNew.onclick = () => {
-  audioPreview.classList.add("hidden");
+  // Animate audio player disappearance
+  if (
+    window.animation &&
+    window.animation.animateAudioPlayer
+  ) {
+    window.animation.animateAudioPlayer(
+      audioPreview,
+      false
+    );
+  } else {
+    audioPreview.classList.add("hidden");
+  }
   currentAudioBlob = null;
   ttsAudio.src = "";
   btnPreview.textContent = "🔊 Nghe thử";
   btnPreview.disabled = true;
 };
+
+// --- Helpers functions (modified to use animation system) ---
+function showLoader(
+  show,
+  customMessage = null
+) {
+  // Animate global loader overlay
+  if (
+    window.animation &&
+    window.animation.animateGlobalLoader
+  ) {
+    const loaderElement =
+      document.getElementById("loader");
+    window.animation.animateGlobalLoader(
+      loaderElement,
+      show
+    );
+  }
+  // Animate the specific TTS card for pulsing effect
+  if (
+    window.animation &&
+    window.animation.animateLoadingCard
+  ) {
+    window.animation.animateLoadingCard(
+      ttsCard,
+      show
+    );
+  }
+
+  // Update message for global loader
+  const loaderElement =
+    document.getElementById("loader");
+  if (!loaderElement) return;
+  const messageElement =
+    loaderElement.querySelector("span");
+  if (messageElement) {
+    messageElement.textContent =
+      customMessage ||
+      "Đang xử lý, vui lòng đợi...";
+  }
+}
+
+function downloadBlob(blob, filename) {
+  const url =
+    globalThis.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style.display = "none";
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    globalThis.URL.revokeObjectURL(url);
+  }, 100);
+}

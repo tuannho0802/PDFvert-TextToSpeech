@@ -29,6 +29,9 @@ const selectedOperationText =
   );
 const operationCards =
   document.querySelectorAll(".operation-card");
+const conversionCard = document.querySelector(
+  ".main-container > div:first-child"
+); // Assuming the first card is the conversion card
 
 // Current selected operation (default to 'convert')
 let currentOperation = "convert";
@@ -251,6 +254,30 @@ document.addEventListener(
   "DOMContentLoaded",
   () => {
     selectOperation("convert");
+    // Initialize page load animations
+    if (
+      window.animation &&
+      window.animation.initPageLoadAnimations
+    ) {
+      window.animation.initPageLoadAnimations();
+    }
+    // Apply button effects
+    if (
+      window.animation &&
+      window.animation.applyButtonPressEffect
+    ) {
+      window.animation.applyButtonPressEffect(
+        btnConvert
+      );
+    }
+    if (
+      window.animation &&
+      window.animation.applyButtonHoverGlow
+    ) {
+      window.animation.applyButtonHoverGlow(
+        btnConvert
+      );
+    }
   }
 );
 
@@ -398,12 +425,14 @@ btnConvert.onclick = async () => {
 
     downloadBlob(blob, newFileName);
   } catch (err) {
-    alert(err.message);
+    window.animation.showToast(
+      err.message,
+      "error"
+    );
   } finally {
     showLoader(false);
   }
 };
-
 
 // --- OCR Processing ---
 async function handleOCR() {
@@ -418,16 +447,19 @@ async function handleOCR() {
       timeout: 5000,
     });
   } catch (e) {
-    alert(
-      "Không thể kết nối tới CDN. Vui lòng kiểm tra kết nối internet."
+    window.animation.showToast(
+      "Không thể kết nối tới CDN. Vui lòng kiểm tra kết nối internet.",
+      "error"
     );
     return;
   }
 
   // Check if Tesseract.js is available
   if (typeof Tesseract === "undefined") {
-    alert(
-      "Tesseract.js chưa được tải. Có thể do:\n1. Kết nối internet chậm\n2. Firewall chặn CDN\n3. Browser không hỗ trợ\n\nVui lòng thử:\n- Refresh trang (F5)\n- Kiểm tra kết nối internet\n- Tắt VPN hoặc proxy\n- Sử dụng Chrome/Edge browser"
+    window.animation.showToast(
+      "Tesseract.js chưa được tải. Có thể do:\n1. Kết nối internet chậm\n2. Firewall chặn CDN\n3. Browser không hỗ trợ\n\nVui lòng thử:\n- Refresh trang (F5)\n- Kiểm tra kết nối internet\n- Tắt VPN hoặc proxy\n- Sử dụng Chrome/Edge browser",
+      "error",
+      7
     );
     return;
   }
@@ -441,8 +473,9 @@ async function handleOCR() {
   try {
     // Only support images for OCR
     if (!file.type.startsWith("image/")) {
-      throw new Error(
-        "OCR chỉ hỗ trợ file ảnh (JPG, PNG). Vui lòng chọn file ảnh."
+      window.animation.showToast(
+        "OCR chỉ hỗ trợ file ảnh (JPG, PNG). Vui lòng chọn file ảnh.",
+        "error"
       );
     }
 
@@ -469,7 +502,10 @@ async function handleOCR() {
       "OCR processing failed:",
       error
     );
-    alert(`Lỗi OCR: ${error.message}`);
+    window.animation.showToast(
+      `Lỗi OCR: ${error.message}`,
+      "error"
+    );
   } finally {
     showLoader(false);
   }
@@ -541,8 +577,9 @@ async function sendOCRTextToServer(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(
-      `Lỗi từ server: ${errorText}`
+    window.animation.showToast(
+      `Lỗi từ server: ${errorText}`,
+      "error"
     );
   }
 
@@ -557,22 +594,34 @@ function showLoader(
   show,
   customMessage = null
 ) {
-  loader.classList.toggle("hidden", !show);
+  // Animate global loader overlay
+  if (
+    window.animation &&
+    window.animation.animateGlobalLoader
+  ) {
+    window.animation.animateGlobalLoader(
+      loader,
+      show
+    );
+  }
+  // Animate the specific conversion card for pulsing effect
+  if (
+    window.animation &&
+    window.animation.animateLoadingCard
+  ) {
+    window.animation.animateLoadingCard(
+      conversionCard,
+      show
+    );
+  }
 
-  if (show && customMessage) {
-    const messageElement =
-      loader.querySelector("span");
-    if (messageElement) {
-      messageElement.textContent =
-        customMessage;
-    }
-  } else if (show) {
-    const messageElement =
-      loader.querySelector("span");
-    if (messageElement) {
-      messageElement.textContent =
-        "Đang xử lý, vui lòng đợi...";
-    }
+  // Update message for global loader
+  const messageElement =
+    loader.querySelector("span");
+  if (messageElement) {
+    messageElement.textContent =
+      customMessage ||
+      "Đang xử lý, vui lòng đợi...";
   }
 }
 
@@ -600,7 +649,10 @@ dropZone.addEventListener("drop", (e) => {
   if (currentOperation === "merge") {
     // Handle multiple files for merge
     if (files.length < 2) {
-      alert("Cần ít nhất 2 file để gộp!");
+      window.animation.showToast(
+        "Cần ít nhất 2 file để gộp!",
+        "error"
+      );
       return;
     }
 
